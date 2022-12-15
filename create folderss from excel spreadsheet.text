@@ -1,1 +1,48 @@
-use AppleScript version "2.4" -- Yosemite (10.10) or lateruse scripting additions--default choose file dialog. THe type is an Apple UTI, uniform type identifier,--not the other kind. returns an alias to the file you pickset theExcelSource to choose file with prompt ¬	"Choose the Excel file with the folder names" default location (path to desktop) of type {"org.openxmlformats.spreadsheetml.sheet"} without invisibles and multiple selections allowedtell application "Microsoft Excel"	--yes, it's "open workbook" the command and "workbook file name (text version of alias)"	--this will bite you	set convertExcelToFolders to open workbook workbook file name (theExcelSource as text)		--get the active worksheet	set convertExcelToFoldersSheet to active sheet of convertExcelToFolders	--get the used range	set theNameListRange to used range of convertExcelToFoldersSheet		--count the rows in the range, a more simplistic way to do it, but not as specific	set numCells to (count rows of theNameListRange)	--build our end cell lable	set endCell to "A" & numCells	--applescript has a number of built-in UI primitives that don't require as much work as powershell does	--this creates an alias to where you want the folders to be created	--you get the "create new folder" button for free in the dialog, no need to specify it	set destinationFolder to choose folder with prompt ¬		"Select where you want the folders to be created" default location (path to desktop)		--set up our beginning and ending of the range. this is effectively the same as the powershell version	--just a bit more simplistic	set theRange to "A1:" & endCell		--get an (applescript) list of cells in the range from Excel	set theNameCells to every cell in range theRange of convertExcelToFoldersSheet	--iterate through the list of cells	repeat with theCell in theNameCells		--pull value2 for the folder name		set foldername to value2 of theCell		--we have to explicitly target the finder with this, a convention dating back to the early 1990s		--a lot of folder/file stuff is part of the finder		tell application "Finder"			--make a new folder in the destination with the desired name			make new folder at destinationFolder with properties {name:foldername}		end tell	end repeat	--we're done, quit the app because we're nice that way	quitend tell
+use AppleScript version "2.4" -- Yosemite (10.10) or later
+use scripting additions
+
+--default choose file dialog. THe type is an Apple UTI, uniform type identifier,
+--not the other kind. returns an alias to the file you pick
+set theExcelSource to choose file with prompt ¬
+	"Choose the Excel file with the folder names" default location (path to desktop) of type {"org.openxmlformats.spreadsheetml.sheet"}
+
+tell application "Microsoft Excel"
+	--yes, it's "open workbook" the command and "workbook file name (text version of alias)"
+	--this will bite you
+	set convertExcelToFolders to open workbook workbook file name (theExcelSource as text)
+	
+	--get the active worksheet
+	set convertExcelToFoldersSheet to active sheet of convertExcelToFolders
+	--get the used range
+	set theNameListRange to used range of convertExcelToFoldersSheet
+	
+	--count the rows in the range, a more simplistic way to do it, but not as specific
+	set numCells to (count rows of theNameListRange)
+	--build our end cell lable
+	set endCell to "A" & numCells
+	--applescript has a number of built-in UI primitives that don't require as much work as powershell does
+	--this creates an alias to where you want the folders to be created
+	--you get the "create new folder" button for free in the dialog, no need to specify it
+	set destinationFolder to choose folder with prompt ¬
+		"Select where you want the folders to be created" default location (path to desktop)
+	
+	--set up our beginning and ending of the range. this is effectively the same as the powershell version
+	--just a bit more simplistic
+	set theRange to "A1:" & endCell
+	
+	--get an (applescript) list of cells in the range from Excel
+	set theNameCells to every cell in range theRange of convertExcelToFoldersSheet
+	--iterate through the list of cells
+	repeat with theCell in theNameCells
+		--pull value2 for the folder name
+		set foldername to value2 of theCell
+		--we have to explicitly target the finder with this, a convention dating back to the early 1990s
+		--a lot of folder/file stuff is part of the finder
+		tell application "Finder"
+			--make a new folder in the destination with the desired name
+			make new folder at destinationFolder with properties {name:foldername}
+		end tell
+	end repeat
+	--we're done, quit the app because we're nice that way
+	quit
+end tell

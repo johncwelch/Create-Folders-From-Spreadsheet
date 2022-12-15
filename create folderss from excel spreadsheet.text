@@ -4,7 +4,7 @@ use scripting additions
 --default choose file dialog. THe type is an Apple UTI, uniform type identifier,
 --not the other kind. returns an alias to the file you pick
 set theExcelSource to choose file with prompt ¬
-	"Choose the Excel file with the folder names" default location (path to desktop) of type {"org.openxmlformats.spreadsheetml.sheet"}
+	"Choose the Excel file with the folder names" default location (path to desktop) of type {"com.microsoft.excel.openxmlformats.spreadsheetml.sheet"}
 
 tell application "Microsoft Excel"
 	--yes, it's "open workbook" the command and "workbook file name (text version of alias)"
